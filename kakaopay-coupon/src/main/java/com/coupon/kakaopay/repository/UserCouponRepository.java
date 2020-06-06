@@ -29,7 +29,7 @@ public interface UserCouponRepository extends JpaRepository<UserCoupon, Long> {
 	List<UserCoupon> findAllByExpiryDate(LocalDate expiryDate);
 
 	@Modifying
-	@Query(value = "update UserCoupon uc set uc.status = :#{#userCoupon.status} where uc.serial = :#{#userCoupon.serial}")
+	@Query(value = "UPDATE UserCoupon SET status = :#{#userCoupon.status} WHERE serial = :#{#userCoupon.serial}")
 	void updateUserCouponStatus(@Param("userCoupon") UserCoupon userCoupon);
 
 }

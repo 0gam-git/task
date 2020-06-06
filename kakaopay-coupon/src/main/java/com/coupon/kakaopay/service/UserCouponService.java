@@ -6,12 +6,16 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.coupon.kakaopay.exception.BadRequestException;
 import com.coupon.kakaopay.model.dto.Coupon;
 import com.coupon.kakaopay.model.dto.User;
 import com.coupon.kakaopay.model.dto.UserCoupon;
@@ -32,6 +36,9 @@ public class UserCouponService {
 
 	@Autowired
 	private CouponRepository couponRepository;
+
+	@Value("${coupon.period}")
+	private Long period;
 
 	@Transactional(readOnly = true)
 	public Optional<UserCoupon> getBySerial(Long serial) {
@@ -76,17 +83,18 @@ public class UserCouponService {
 		return userCoupon;
 	}
 
+	@Cacheable(value = "userCouponList", key = "#serial")
 	@Transactional(readOnly = true)
 	public List<UserCoupon> getUserCouponList(Long serial) {
 		User user = getUser(serial);
-
 		List<UserCoupon> userCouponList = userCouponRepository.findAllByUser(user);
 		if (userCouponList.isEmpty())
-			throw new NoSuchElementException();
+			throw new BadRequestException("Your coupon cannot be found.");
 
 		return userCouponList;
 	}
 
+	@CachePut(value = "userCouponList", key = "#serial")
 	@Transactional
 	public UserCoupon updateCouponPayment(Long serial, CouponPayment couponPayment) {
 		User user = getUser(serial);
@@ -96,6 +104,7 @@ public class UserCouponService {
 		return updateCouponStatus(couponPayment, userCoupon);
 	}
 
+	@Cacheable(value = "expiredOnTheDay", key = "#expiryDate")
 	@Transactional(readOnly = true)
 	public Page<UserCoupon> getUserCouponListByStatusAndExpiryDate(CouponStatus status, LocalDate expiryDate,
 			Pageable pageable) {
@@ -107,7 +116,7 @@ public class UserCouponService {
 	@Transactional(readOnly = true)
 	public User getUser(Long serial) {
 		Optional<User> user = userRepository.findById(serial);
-		user.orElseThrow(() -> new NoSuchElementException());
+		user.orElseThrow(() -> new BadRequestException("The user cannot be found."));
 		return user.get();
 	}
 
@@ -115,7 +124,7 @@ public class UserCouponService {
 	public Coupon getCoupon() {
 		Page<Coupon> coupons = couponRepository.findByUserCouponIsNull(PageRequest.of(0, 1));
 		if (coupons.isEmpty())
-			throw new NoSuchElementException();
+			throw new BadRequestException("There are no coupons. Please create a coupon.");
 
 		Optional<Coupon> coupon = coupons.stream().findFirst();
 		coupon.orElseThrow(() -> new NoSuchElementException());
@@ -125,14 +134,14 @@ public class UserCouponService {
 	@Transactional(readOnly = true)
 	public Coupon getCouponByCode(String code) {
 		Optional<Coupon> coupon = couponRepository.findById(code);
-		coupon.orElseThrow(() -> new NoSuchElementException());
+		coupon.orElseThrow(() -> new BadRequestException("Invalid coupon code."));
 		return coupon.get();
 	}
 
 	@Transactional(readOnly = true)
 	public UserCoupon getUserCoupon(User user, Coupon coupon) {
 		Optional<UserCoupon> userCoupon = userCouponRepository.findByUserAndCoupon(user, coupon);
-		userCoupon.orElseThrow(() -> new NoSuchElementException());
+		userCoupon.orElseThrow(() -> new BadRequestException("The requested coupon cannot be found."));
 		return userCoupon.get();
 	}
 
@@ -140,7 +149,7 @@ public class UserCouponService {
 		UserCoupon userCoupon = new UserCoupon(coupon, user, CouponStatus.UNUSED);
 		LocalDate startDate = LocalDate.now();
 		userCoupon.setStartDate(startDate);
-		userCoupon.setExpiryDate(startDate.plusDays(3));
+		userCoupon.setExpiryDate(startDate.plusDays(this.period));
 		return userCouponRepository.save(userCoupon);
 	}
 

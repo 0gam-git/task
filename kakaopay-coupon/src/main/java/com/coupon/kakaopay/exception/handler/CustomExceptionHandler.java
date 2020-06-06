@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 
+import com.coupon.kakaopay.exception.BadRequestException;
 import com.coupon.kakaopay.exception.InvalidNumberSizeException;
 import com.coupon.kakaopay.model.response.ResponseModel;
 import com.coupon.kakaopay.util.DateUtil;
@@ -26,7 +27,18 @@ public class CustomExceptionHandler {
 		errorModel.setPath(ResponseUtil.getUri(req));
 		errorModel.setStatus(HttpStatus.NOT_FOUND.hashCode());
 		errorModel.setMessage(ex.getLocalizedMessage());
+		return errorModel;
+	}
 
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(BadRequestException.class)
+	@ResponseBody
+	public ResponseModel handleBadRequestException(WebRequest req, BadRequestException ex) {
+		ResponseModel errorModel = new ResponseModel();
+		errorModel.setTimestamp(DateUtil.getTimestamp());
+		errorModel.setPath(ResponseUtil.getUri(req));
+		errorModel.setStatus(HttpStatus.BAD_REQUEST.hashCode());
+		errorModel.setMessage(ex.getLocalizedMessage());
 		return errorModel;
 	}
 
@@ -39,7 +51,6 @@ public class CustomExceptionHandler {
 		errorModel.setPath(ResponseUtil.getUri(req));
 		errorModel.setStatus(HttpStatus.BAD_REQUEST.hashCode());
 		errorModel.setMessage(ex.getLocalizedMessage());
-
 		return errorModel;
 	}
 
@@ -51,20 +62,17 @@ public class CustomExceptionHandler {
 		errorModel.setPath(ResponseUtil.getUri(req));
 		errorModel.setStatus(HttpStatus.BAD_REQUEST.hashCode());
 		errorModel.setMessage(ex.getLocalizedMessage());
-
 		return errorModel;
 	}
 
 	@ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
 	@ResponseBody
 	public ResponseModel handleNotJsonRequest(WebRequest req, Exception ex) {
-		log.info("## handleNotJsonRequest - Unsupported Media Type");
 		ResponseModel errorModel = new ResponseModel();
 		errorModel.setTimestamp(DateUtil.getTimestamp());
 		errorModel.setPath(ResponseUtil.getUri(req));
 		errorModel.setStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE.hashCode());
 		errorModel.setMessage(HttpStatus.UNSUPPORTED_MEDIA_TYPE.getReasonPhrase());
-
 		return errorModel;
 	}
 

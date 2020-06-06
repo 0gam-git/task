@@ -38,5 +38,6 @@ logging:
     com.zaxxer: DEBUG
     org.springframework.jdbc: DEBUG
   
-    
+
+coupon.period: 6
   

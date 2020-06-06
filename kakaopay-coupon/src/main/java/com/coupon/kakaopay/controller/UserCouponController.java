@@ -54,10 +54,10 @@ public class UserCouponController {
 	 * 
 	 */
 	@PatchMapping(value = "/{userId}/coupon/status")
-	public UserCoupon updateCouponStatus(@PathVariable Long userId, @RequestBody @Valid CouponPayment couponPayment) {
+	public void updateCouponStatus(@PathVariable Long userId, @RequestBody @Valid CouponPayment couponPayment) {
 		log.info("## UserCouponController - updateCouponStatus(user_serial : {}, CouponPayment : {})", userId,
 				couponPayment);
-		return userCouponService.updateCouponPayment(userId, couponPayment);
+		userCouponService.updateCouponPayment(userId, couponPayment);
 	}
 
 }
