@@ -1,0 +1,42 @@
+spring:
+  redis:
+    port: 6379
+  
+  jpa:
+    hibernate:
+      ddl-auto: update  # update, create-drop
+    
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+    
+    properties:
+      hibernate.format_sql: true
+      hibernate.generate_statistics: true
+      hibernate.order_inserts: true
+      hibernate.jdbc.batch_size: 8
+    
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC&characterEncoding=UTF-8&rewriteBatchedStatements=true&useServerPrepStmts=true&cachePrepStmts=true
+    username: root
+    password: 1q2w3e4r!@
+    
+    # https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
+    hikari:
+      pool-name: HikariPoolZZZ
+  
+server:
+  address: localhost
+  port: 8080
+
+logging:
+ level:
+    root: ERROR
+    org.springframework: INFO
+    com.coupon.kakaopay: DEBUG
+    com.zaxxer: DEBUG
+    org.springframework.jdbc: DEBUG
+  
+    
+  
