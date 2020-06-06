@@ -49,6 +49,11 @@ public class UserCouponService {
 	}
 
 	@Transactional
+	public void updateUserCouponStatus(UserCoupon userCoupon) {
+		userCouponRepository.updateUserCouponStatus(userCoupon);
+	}
+
+	@Transactional
 	public void deleteBySerial(Long serial) {
 		userCouponRepository.deleteById(serial);
 	}

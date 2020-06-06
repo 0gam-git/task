@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +18,6 @@ import com.coupon.kakaopay.model.dto.Coupon;
 import com.coupon.kakaopay.model.dto.User;
 import com.coupon.kakaopay.model.dto.UserCoupon;
 import com.coupon.kakaopay.model.type.CouponStatus;
-import com.coupon.kakaopay.repository.UserCouponRepository;
 import com.coupon.kakaopay.service.batch.CouponBatchService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -36,13 +34,8 @@ public class UserCouponServiceTest {
 	private CouponService couponService;
 
 	@Autowired
-	private UserCouponRepository userCouponRepository;
-
-	@Autowired
 	private CouponBatchService couponBatchService;
 
-	@Ignore
-	@Test
 	public void 날짜_테스트() {
 		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 		assertThat(today).isEqualTo("2020-06-05");
@@ -80,7 +73,7 @@ public class UserCouponServiceTest {
 		Optional<User> user = userService.getBySerial(1L);
 		assertThat(user).isNotEmpty();
 
-		List<UserCoupon> userCouponList = userCouponRepository.findAllByUser(user.get());
+		List<UserCoupon> userCouponList = userCouponService.getAllByUser(user.get());
 		assertThat(userCouponList).isNotEmpty();
 	}
 
@@ -89,13 +82,13 @@ public class UserCouponServiceTest {
 		Optional<User> user = userService.getBySerial(1L);
 		assertThat(user).isNotEmpty();
 
-		List<UserCoupon> userCouponList = userCouponRepository.findAllByUser(user.get());
+		List<UserCoupon> userCouponList = userCouponService.getAllByUser(user.get());
 		assertThat(userCouponList).isNotEmpty();
 
 		UserCoupon userCoupon = userCouponList.get(0);
-
 		userCoupon.setStatus(CouponStatus.USED);
-		userCouponRepository.save(userCoupon);
+
+		userCouponService.updateUserCouponStatus(userCoupon);
 	}
 
 	@Test
@@ -103,21 +96,20 @@ public class UserCouponServiceTest {
 		Optional<User> user = userService.getBySerial(1L);
 		assertThat(user).isNotEmpty();
 
-		List<UserCoupon> userCouponList = userCouponRepository.findAllByUser(user.get());
+		List<UserCoupon> userCouponList = userCouponService.getAllByUser(user.get());
 		assertThat(userCouponList).isNotEmpty();
 
 		UserCoupon userCoupon = userCouponList.get(0);
 
 		userCoupon.setStatus(CouponStatus.UNUSED);
-		userCouponRepository.save(userCoupon);
+		userCouponService.updateUserCouponStatus(userCoupon);
 	}
 
 	@Test
 	public void 오늘이_만료인_쿠폰_조회_테스트() {
 		LocalDate localDate = LocalDate.now(ZoneId.of("Asia/Seoul"));
-		List<UserCoupon> list = userCouponRepository.findAllByExpiryDate(localDate);
+		List<UserCoupon> list = userCouponService.getUserCouponListByExpiryDate(localDate);
 		assertThat(list).isNotEmpty();
-		// 오늘이 만료인 쿠폰은 만료 상태로 변경 필요.
 	}
 
 	@Test
@@ -136,7 +128,7 @@ public class UserCouponServiceTest {
 	@Test
 	public void 오늘이_만료일이면서_만료상태인_쿠폰_조회_테스트() {
 		LocalDate localDate = LocalDate.now(ZoneId.of("Asia/Seoul"));
-		Page<UserCoupon> userCoupons = userCouponRepository.findAllByStatusAndExpiryDate(CouponStatus.EXPIRED,
+		Page<UserCoupon> userCoupons = userCouponService.getUserCouponListByStatusAndExpiryDate(CouponStatus.EXPIRED,
 				localDate, PageRequest.of(0, 10));
 		assertThat(userCoupons).isNotEmpty();
 	}

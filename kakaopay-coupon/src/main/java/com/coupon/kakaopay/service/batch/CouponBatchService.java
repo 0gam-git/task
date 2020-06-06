@@ -26,7 +26,7 @@ public class CouponBatchService {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	private final int batchSize = 10000;
+	private static final int BATCH_SIZE = 10000;
 
 	@Transactional
 	public void createCouponByCount(int n) throws UnsupportedEncodingException, NoSuchAlgorithmException {
@@ -39,12 +39,12 @@ public class CouponBatchService {
 			newCouponList.add(coupon);
 		}
 
-		batchInsert(newCouponList, batchSize);
+		batchInsert(newCouponList, BATCH_SIZE);
 	}
 
 	@Transactional
 	public void updateUserCoupon(List<UserCoupon> userCouponList) {
-		batchUpdate(userCouponList, batchSize);
+		batchUpdate(userCouponList, BATCH_SIZE);
 	}
 
 	// ----------------------------------------------------------------------

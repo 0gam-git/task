@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,8 +46,6 @@ public class CouponServiceTest {
 
 	// -------------------------------------------------
 
-	@Ignore
-	@Test
 	public void 쿠폰_N개_만들기_JPA_테스트() throws UnsupportedEncodingException, NoSuchAlgorithmException {
 		int input = 1000000;
 		List<Coupon> couponList = createByCount(input);

@@ -7,6 +7,9 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.coupon.kakaopay.model.dto.Coupon;
@@ -22,7 +25,11 @@ public interface UserCouponRepository extends JpaRepository<UserCoupon, Long> {
 	Optional<UserCoupon> findByUserAndCoupon(User user, Coupon coupon);
 
 	Page<UserCoupon> findAllByStatusAndExpiryDate(CouponStatus status, LocalDate expiryDate, Pageable pageable);
-	
+
 	List<UserCoupon> findAllByExpiryDate(LocalDate expiryDate);
+
+	@Modifying
+	@Query(value = "update UserCoupon uc set uc.status = :#{#userCoupon.status} where uc.serial = :#{#userCoupon.serial}")
+	void updateUserCouponStatus(@Param("userCoupon") UserCoupon userCoupon);
 
 }
