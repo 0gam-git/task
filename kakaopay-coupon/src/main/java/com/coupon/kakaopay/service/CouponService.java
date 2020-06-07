@@ -1,8 +1,8 @@
 package com.coupon.kakaopay.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +16,8 @@ public class CouponService {
 	private CouponRepository couponRepository;
 
 	@Transactional(readOnly = true)
-	public Page<Coupon> getCoupons(Pageable pageable) {
-		return couponRepository.findByUserCouponIsNull(pageable);
+	public Optional<Coupon> getCoupons() {
+		return couponRepository.findFirstByUserCouponIsNull();
 	}
 
 	@Transactional

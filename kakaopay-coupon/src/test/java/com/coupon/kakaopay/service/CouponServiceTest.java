@@ -12,8 +12,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 
 import com.coupon.kakaopay.model.dto.Coupon;
 import com.coupon.kakaopay.repository.CouponRepository;
@@ -37,10 +35,7 @@ public class CouponServiceTest {
 
 	@Test
 	public void 등록되지_않은_쿠폰_하나_가져오기_테스트() {
-		Page<Coupon> coupons = couponRepository.findByUserCouponIsNull(PageRequest.of(0, 1));
-		assertThat(coupons).isNotEmpty();
-
-		Optional<Coupon> coupon = coupons.stream().findFirst();
+		Optional<Coupon> coupon = couponRepository.findFirstByUserCouponIsNull();
 		assertThat(coupon).isNotEmpty();
 	}
 

@@ -52,10 +52,7 @@ public class UserCouponServiceTest {
 		Optional<User> user = userService.getByEmail(email);
 		assertThat(user).isNotEmpty();
 
-		Page<Coupon> coupons = couponService.getCoupons(PageRequest.of(0, 1));
-		assertThat(coupons).isNotEmpty();
-
-		Optional<Coupon> coupon = coupons.stream().findFirst();
+		Optional<Coupon> coupon = couponService.getCoupons();
 		coupon.orElseThrow(() -> new NoSuchElementException());
 		Coupon c = coupon.get();
 
@@ -135,6 +132,12 @@ public class UserCouponServiceTest {
 		assertThat(userCoupons).isNotEmpty();
 	}
 
+	@Test
+	public void 발급된_쿠폰중_만료_3일전_조회_테스트() {
+		List<UserCoupon> list = userCouponService.getUsercouponListByUserAndExpiryDate(1L);
+		assertThat(list).isNotEmpty();
+	}
+
 	// ------------------------------------------
 
 	@Test
@@ -151,7 +154,7 @@ public class UserCouponServiceTest {
 
 	@Test
 	public void updateCouponPayment() {
-		Long serial = 2L;
+		Long serial = 1L;
 		List<UserCoupon> UserCouponList = userCouponService.getUserCouponList(serial);
 		assertThat(UserCouponList).isNotEmpty();
 

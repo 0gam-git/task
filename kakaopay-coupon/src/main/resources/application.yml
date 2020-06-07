@@ -27,7 +27,6 @@ spring:
       pool-name: HikariPoolZZZ
       data-source-properties: 
         cachePrepStmts: true
-        useServerPrepStmts: true
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useLocalSessionState: true

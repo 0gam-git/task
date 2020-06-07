@@ -45,6 +45,13 @@ public class UserCouponController {
 	@GetMapping(value = "/{userId}/coupons")
 	public List<UserCoupon> getUserCoupons(@PathVariable Long userId) {
 		log.info("## UserCouponController - getUserCoupons(user_serial : {})", userId);
+		List<UserCoupon> usercouponList = userCouponService.getUsercouponListByUserAndExpiryDate(userId);
+		if (!usercouponList.isEmpty()) {
+			for (UserCoupon userCoupon : usercouponList) {
+				log.info("[{}] 쿠폰이 3일 후 만료됩니다.", userCoupon.getCoupon().getCode());
+			}
+		}
+
 		return userCouponService.getUserCouponList(userId);
 	}
 

@@ -1,14 +1,15 @@
 package com.coupon.kakaopay.service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,8 +70,18 @@ public class UserCouponService {
 		return userCouponRepository.findAllByExpiryDate(expiryDate);
 	}
 
+	@Transactional(readOnly = true)
+	public List<UserCoupon> getUsercouponListByUserAndExpiryDate(Long serial) {
+		User user = getUser(serial);
+		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+		LocalDate threeDaysAgo = today.plusDays(3);
+
+		return userCouponRepository.findAllByUserAndExpiryDate(user, threeDaysAgo);
+	}
+
 	// ----------------------------------------------------
 
+	@CacheEvict(value = "userCoupons", key = "#serial")
 	@Transactional
 	public Coupon createUserCoupon(Long serial) {
 		User user = getUser(serial);
@@ -81,6 +92,7 @@ public class UserCouponService {
 		return markUserCoupon(coupon, userCoupon);
 	}
 
+	@Cacheable(value = "userCoupons", key = "#serial")
 	@Transactional(readOnly = true)
 	public List<UserCoupon> getUserCouponList(Long serial) {
 		User user = getUser(serial);
@@ -91,6 +103,7 @@ public class UserCouponService {
 		return userCouponList;
 	}
 
+	@CacheEvict(value = "userCoupons", key = "#serial")
 	@Transactional
 	public void updateCouponPayment(Long serial, CouponPayment couponPayment) {
 		User user = getUser(serial);
@@ -119,11 +132,10 @@ public class UserCouponService {
 
 	@Transactional(readOnly = true)
 	public Coupon getCoupon() {
-		Page<Coupon> coupons = couponRepository.findByUserCouponIsNull(PageRequest.of(0, 1));
-		if (coupons.isEmpty())
-			throw new BadRequestException(ExceptionMessageType.NeedToCreateCoupons.getMessage());
+		Optional<Coupon> coupon = couponRepository.findFirstByUserCouponIsNull();
+		coupon.orElseThrow(() -> new BadRequestException(ExceptionMessageType.NeedToCreateCoupons.getMessage()));
 
-		return coupons.stream().findFirst().get();
+		return coupon.get();
 	}
 
 	@Transactional(readOnly = true)
