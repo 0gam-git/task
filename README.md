@@ -7,6 +7,8 @@ Java 1.8
 
 Spring boot 2.3.0.RELEASE
 
+MariaDB 10.5.3
+
 Redis server v=4.0.9
 
 # Watch Out!
