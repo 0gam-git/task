@@ -5,7 +5,7 @@ Rest API 기반 쿠폰시스템
 ## Requirements
 Java 1.8
 
-Spring boot 2.3.0.RELEASE
+<a>https://spring.io/projects/spring-boot Spring boot 2.3.0.RELEASE </a>
 
 MariaDB 10.5.3
 
