@@ -15,6 +15,6 @@ Redis server v=4.0.9+
 Update host and port in application.yml for Redis and mariaDB.
 
 # Run
-mvn spring-boot:run
+<code>mvn spring-boot:run</code>
 
 
