@@ -27,7 +27,6 @@ public class CouponStatusScheduler {
 
 	@Scheduled(cron = "0 0 0 * * *")
 	public void updateCouponStatus() {
-		// 쿠폰 만료 상태로 변경
 		log.info("## CouponStatusScheduler - updateCouponStatus()");
 		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 		LocalDate yesterday = today.minusDays(1);

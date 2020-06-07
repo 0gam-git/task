@@ -2,9 +2,6 @@ package com.coupon.kakaopay.contorller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -80,7 +77,7 @@ public class UserControllerTest {
 	public void updateCouponStatus() {
 		// getUserCoupons > get coupon > input coupon code, status
 		CouponPayment payment = new CouponPayment();
-		payment.setCouponCode("17a6eef5-0b63-5c9a-9e8d-8e503ec07650");
+		payment.setCouponCode("347ead7b-95a4-5df9-a9a4-de5592548744");
 		payment.setStatus(CouponStatus.USED);
 
 		HttpHeaders headers = new HttpHeaders();

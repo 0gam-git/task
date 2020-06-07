@@ -58,7 +58,7 @@ public class AdminController {
 		ResponseModel response = new ResponseModel();
 		response.setTimestamp(DateUtil.getTimestamp());
 		response.setPath(ResponseUtil.getUri(req));
-		response.setStatus(HttpStatus.CREATED.hashCode());
+		response.setStatus(HttpStatus.CREATED.value());
 		response.setMessage("N coupons with random codes are generated and stored in the database.");
 
 		return response;

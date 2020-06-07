@@ -26,7 +26,7 @@ public class CustomExceptionHandler {
 		ResponseModel errorModel = new ResponseModel();
 		errorModel.setTimestamp(DateUtil.getTimestamp());
 		errorModel.setPath(ResponseUtil.getUri(req));
-		errorModel.setStatus(HttpStatus.BAD_REQUEST.hashCode());
+		errorModel.setStatus(HttpStatus.BAD_REQUEST.value());
 		errorModel.setMessage(ex.getLocalizedMessage());
 		return errorModel;
 	}
@@ -38,7 +38,7 @@ public class CustomExceptionHandler {
 		ResponseModel errorModel = new ResponseModel();
 		errorModel.setTimestamp(DateUtil.getTimestamp());
 		errorModel.setPath(ResponseUtil.getUri(req));
-		errorModel.setStatus(HttpStatus.BAD_REQUEST.hashCode());
+		errorModel.setStatus(HttpStatus.BAD_REQUEST.value());
 		errorModel.setMessage(ex.getLocalizedMessage());
 		return errorModel;
 	}
@@ -50,7 +50,7 @@ public class CustomExceptionHandler {
 		ResponseModel errorModel = new ResponseModel();
 		errorModel.setTimestamp(DateUtil.getTimestamp());
 		errorModel.setPath(ResponseUtil.getUri(req));
-		errorModel.setStatus(HttpStatus.BAD_REQUEST.hashCode());
+		errorModel.setStatus(HttpStatus.BAD_REQUEST.value());
 		errorModel.setMessage(ex.getLocalizedMessage());
 		return errorModel;
 	}
@@ -61,7 +61,7 @@ public class CustomExceptionHandler {
 		ResponseModel errorModel = new ResponseModel();
 		errorModel.setTimestamp(DateUtil.getTimestamp());
 		errorModel.setPath(ResponseUtil.getUri(req));
-		errorModel.setStatus(HttpStatus.NOT_FOUND.hashCode());
+		errorModel.setStatus(HttpStatus.NOT_FOUND.value());
 		errorModel.setMessage(ex.getLocalizedMessage());
 		return errorModel;
 	}
@@ -73,7 +73,7 @@ public class CustomExceptionHandler {
 		ResponseModel errorModel = new ResponseModel();
 		errorModel.setTimestamp(DateUtil.getTimestamp());
 		errorModel.setPath(ResponseUtil.getUri(req));
-		errorModel.setStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE.hashCode());
+		errorModel.setStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
 		errorModel.setMessage(HttpStatus.UNSUPPORTED_MEDIA_TYPE.getReasonPhrase());
 		return errorModel;
 	}
@@ -85,7 +85,7 @@ public class CustomExceptionHandler {
 		ResponseModel errorModel = new ResponseModel();
 		errorModel.setTimestamp(DateUtil.getTimestamp());
 		errorModel.setPath(ResponseUtil.getUri(req));
-		errorModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.hashCode());
+		errorModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		errorModel.setMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
 		return errorModel;
 	}
