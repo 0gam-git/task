@@ -17,7 +17,6 @@ import javax.persistence.OneToOne;
 
 import com.coupon.kakaopay.model.type.CouponStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,7 +36,6 @@ public class UserCoupon implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long serial;
 
-	@JsonManagedReference
 	@OneToOne(cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "coupon_id", unique = true)
 	private Coupon coupon;

@@ -31,7 +31,7 @@ public class CouponServiceTest {
 
 	@Test
 	public void 쿠폰_N개_만들기_JDBC_테스트() throws UnsupportedEncodingException, NoSuchAlgorithmException {
-		int input = 1000000;
+		int input = 100000;
 		couponBatchService.createCouponByCount(input);
 	}
 
@@ -47,7 +47,7 @@ public class CouponServiceTest {
 	// -------------------------------------------------
 
 	public void 쿠폰_N개_만들기_JPA_테스트() throws UnsupportedEncodingException, NoSuchAlgorithmException {
-		int input = 1000000;
+		int input = 100000;
 		List<Coupon> couponList = createByCount(input);
 		assertEquals(input, couponList.size());
 	}

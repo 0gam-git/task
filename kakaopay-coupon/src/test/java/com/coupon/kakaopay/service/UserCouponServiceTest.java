@@ -13,10 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.coupon.kakaopay.model.dto.Coupon;
 import com.coupon.kakaopay.model.dto.User;
 import com.coupon.kakaopay.model.dto.UserCoupon;
+import com.coupon.kakaopay.model.request.CouponPayment;
 import com.coupon.kakaopay.model.type.CouponStatus;
 import com.coupon.kakaopay.service.batch.CouponBatchService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -137,8 +139,35 @@ public class UserCouponServiceTest {
 
 	@Test
 	public void createUserCoupon() {
-		UserCoupon userCoupon = userCouponService.createUserCoupon(1L);
-		assertThat(userCoupon).isNotNull();
+		Coupon coupon = userCouponService.createUserCoupon(1L);
+		assertThat(coupon).isNotNull();
+	}
+
+	@Test
+	public void getUserCouponList() {
+		List<UserCoupon> UserCouponList = userCouponService.getUserCouponList(1L);
+		assertThat(UserCouponList).isNotEmpty();
+	}
+
+	@Test
+	public void updateCouponPayment() {
+		Long serial = 2L;
+		List<UserCoupon> UserCouponList = userCouponService.getUserCouponList(serial);
+		assertThat(UserCouponList).isNotEmpty();
+
+		CouponPayment couponPayment = new CouponPayment();
+		couponPayment.setCouponCode(UserCouponList.get(0).getCoupon().getCode());
+		couponPayment.setStatus(CouponStatus.USED);
+
+		userCouponService.updateCouponPayment(serial, couponPayment);
+	}
+
+	@Test
+	public void getUserCouponListByStatusAndExpiryDate() {
+		Pageable pageable = PageRequest.of(0, 10);
+		// @Cacheable
+		userCouponService.getUserCouponListByStatusAndExpiryDate(CouponStatus.EXPIRED,
+				LocalDate.now(ZoneId.of("Asia/Seoul")), pageable);
 	}
 
 }

@@ -19,17 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 public class CustomExceptionHandler {
 
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ResponseBody
-	public ResponseModel handleNotFound(WebRequest req, Exception ex) {
-		ResponseModel errorModel = new ResponseModel();
-		errorModel.setTimestamp(DateUtil.getTimestamp());
-		errorModel.setPath(ResponseUtil.getUri(req));
-		errorModel.setStatus(HttpStatus.NOT_FOUND.hashCode());
-		errorModel.setMessage(ex.getLocalizedMessage());
-		return errorModel;
-	}
-
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(BadRequestException.class)
 	@ResponseBody
@@ -57,6 +46,7 @@ public class CustomExceptionHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
 	public ResponseModel handleBadRequest(WebRequest req, Exception ex) {
+		log.error("BAD_REQUEST - {}", ex.getMessage());
 		ResponseModel errorModel = new ResponseModel();
 		errorModel.setTimestamp(DateUtil.getTimestamp());
 		errorModel.setPath(ResponseUtil.getUri(req));
@@ -65,14 +55,38 @@ public class CustomExceptionHandler {
 		return errorModel;
 	}
 
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseBody
+	public ResponseModel handleNotFound(WebRequest req, Exception ex) {
+		ResponseModel errorModel = new ResponseModel();
+		errorModel.setTimestamp(DateUtil.getTimestamp());
+		errorModel.setPath(ResponseUtil.getUri(req));
+		errorModel.setStatus(HttpStatus.NOT_FOUND.hashCode());
+		errorModel.setMessage(ex.getLocalizedMessage());
+		return errorModel;
+	}
+
 	@ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
 	@ResponseBody
 	public ResponseModel handleNotJsonRequest(WebRequest req, Exception ex) {
+		log.error("UNSUPPORTED_MEDIA_TYPE - {}", ex.getMessage());
 		ResponseModel errorModel = new ResponseModel();
 		errorModel.setTimestamp(DateUtil.getTimestamp());
 		errorModel.setPath(ResponseUtil.getUri(req));
 		errorModel.setStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE.hashCode());
 		errorModel.setMessage(HttpStatus.UNSUPPORTED_MEDIA_TYPE.getReasonPhrase());
+		return errorModel;
+	}
+
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseBody
+	public ResponseModel handleInternalServerError(WebRequest req, Exception ex) {
+		log.error("INTERNAL_SERVER_ERROR - {}", ex.getMessage());
+		ResponseModel errorModel = new ResponseModel();
+		errorModel.setTimestamp(DateUtil.getTimestamp());
+		errorModel.setPath(ResponseUtil.getUri(req));
+		errorModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.hashCode());
+		errorModel.setMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
 		return errorModel;
 	}
 

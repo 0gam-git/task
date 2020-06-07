@@ -1,5 +1,6 @@
 spring:
   redis:
+    host: localhost
     port: 6379
   
   jpa:
@@ -18,11 +19,10 @@ spring:
     
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC&characterEncoding=UTF-8&rewriteBatchedStatements=true&useServerPrepStmts=true&cachePrepStmts=true
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC&characterEncoding=UTF-8&rewriteBatchedStatements=true
     username: root
     password: 1q2w3e4r!@
     
-    # https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
     hikari:
       pool-name: HikariPoolZZZ
   

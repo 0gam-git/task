@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coupon.kakaopay.model.dto.Coupon;
 import com.coupon.kakaopay.model.dto.UserCoupon;
 import com.coupon.kakaopay.model.request.CouponPayment;
 import com.coupon.kakaopay.service.UserCouponService;
@@ -32,7 +33,7 @@ public class UserCouponController {
 	 * 
 	 */
 	@PostMapping(value = "/{userId}/coupon")
-	public UserCoupon createUserCoupon(@PathVariable Long userId) {
+	public Coupon createUserCoupon(@PathVariable Long userId) {
 		log.info("## UserCouponController - createUserCoupon(user_serial : {})", userId);
 		return userCouponService.createUserCoupon(userId);
 	}

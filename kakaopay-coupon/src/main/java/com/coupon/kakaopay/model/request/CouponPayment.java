@@ -16,7 +16,7 @@ public class CouponPayment implements Serializable {
 	private static final long serialVersionUID = -275613482193276392L;
 
 	@NonNull
-	private String CouponCode;
+	private String couponCode;
 
 	@NonNull
 	private CouponStatus status;
