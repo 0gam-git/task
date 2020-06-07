@@ -208,4 +208,6 @@ Update host and port in application.yml for Redis and mariaDB.
 }
 ```
 
-
+## License
+MIT license
+Copyright 2020 © youngjun.byeon
