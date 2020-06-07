@@ -9,7 +9,7 @@ Spring boot 2.3.0.RELEASE
 
 MariaDB 10.5.3
 
-Redis server v=4.0.9
+Redis server v=4.0.9+
 
 # Watch Out!
 Update host and port in application.yml for Redis and mariaDB.
