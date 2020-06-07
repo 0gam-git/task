@@ -211,4 +211,5 @@ Update host and port in application.yml for Redis and mariaDB.
 ## License
 MIT license
 Copyright 2020 © youngjun.byeon
+
 https://github.com/YoungjunByeon/task/blob/master/LICENSE.txt
