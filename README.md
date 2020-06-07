@@ -18,6 +18,7 @@ Update host and port in application.yml for Redis and mariaDB.
 <code>mvn spring-boot:run</code>
 
 ## API Specifications
+```json 
 {
 	"info": {
 		"_postman_id": "3736863a-1143-4931-ba3b-c919bdf54c2c",
@@ -199,3 +200,4 @@ Update host and port in application.yml for Redis and mariaDB.
 	],
 	"protocolProfileBehavior": {}
 }
+```
