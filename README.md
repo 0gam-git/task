@@ -11,6 +11,8 @@ MariaDB 10.5.3(https://downloads.mariadb.org/mariadb/10.5.3/)
 
 Redis server v=4.0.9+(https://redis.io/download)
 
+Postman -v 7.25.3(https://www.postman.com/downloads/)
+
 ## Watch Out!
 Update host and port in application.yml for Redis and mariaDB.
 
