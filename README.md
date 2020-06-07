@@ -20,6 +20,10 @@ Update host and port in application.yml for Redis and mariaDB.
 <code>mvn spring-boot:run</code>
 
 ## API Specifications
+[kakaopay_postman.zip](https://github.com/Urong/task/files/4742045/kakaopay_postman.zip)
+
+
+
 ```json 
 {
 	"info": {
