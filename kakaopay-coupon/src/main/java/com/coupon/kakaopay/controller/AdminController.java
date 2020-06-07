@@ -49,7 +49,7 @@ public class AdminController {
 		Integer count = countModel.getCount();
 		log.info("## SettingController - generatedAndStoreCoupons(count : {})", count);
 
-		if (100000 < count || 0 > count) {
+		if (100000 < count || 0 >= count) {
 			throw new InvalidNumberSizeException("The number requested is too large or too small.");
 		}
 
