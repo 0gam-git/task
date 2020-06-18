@@ -1,5 +1,4 @@
 # coupon 
-Rest API 기반 쿠폰시스템
 
 
 ## Requirements
