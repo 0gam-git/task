@@ -1,0 +1,56 @@
+spring:
+  cache:
+    redis:
+      time-to-live: 86400000 
+  redis:
+    host: localhost
+    port: 6379
+    
+  jpa:
+    hibernate:
+      ddl-auto: update  # update, create-drop
+    
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+    
+    properties:
+      hibernate.format_sql: true
+      hibernate.generate_statistics: true
+      hibernate.order_inserts: true
+      hibernate.jdbc.batch_size: 8
+    
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 1q2w3e4r!@
+    
+    hikari:
+      pool-name: HikariPoolZZZ
+      data-source-properties: 
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useLocalSessionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false
+           
+server:
+  address: localhost
+  port: 8080
+
+logging:
+ level:
+    root: ERROR
+    org.springframework: INFO
+    com.coupon.kakaopay: DEBUG
+    com.zaxxer: DEBUG
+    org.springframework.jdbc: DEBUG
+  
+
+coupon.period: 6
+  
