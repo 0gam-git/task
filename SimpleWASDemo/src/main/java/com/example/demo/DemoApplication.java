@@ -13,9 +13,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import com.example.demo.service.HttpServer;
 
 @SpringBootApplication
-public class SimpleWasDemoApplication implements CommandLineRunner, ExitCodeGenerator {
+public class DemoApplication implements CommandLineRunner, ExitCodeGenerator {
 
-	private static final Logger logger = Logger.getLogger(SimpleWasDemoApplication.class.getCanonicalName());
+	private static final Logger logger = Logger.getLogger(DemoApplication.class.getCanonicalName());
 
 	@Value("${demo.port}")
 	private int defaultPort;
@@ -24,9 +24,13 @@ public class SimpleWasDemoApplication implements CommandLineRunner, ExitCodeGene
 
 	private final ConfigurableApplicationContext context;
 
-	public SimpleWasDemoApplication(HttpServer httpServer, ConfigurableApplicationContext context) {
+	public DemoApplication(HttpServer httpServer, ConfigurableApplicationContext context) {
 		this.httpServer = httpServer;
 		this.context = context;
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
 	}
 
 	@Override
@@ -58,10 +62,6 @@ public class SimpleWasDemoApplication implements CommandLineRunner, ExitCodeGene
 	@Override
 	public int getExitCode() {
 		return 42;
-	}
-
-	public static void main(String[] args) {
-		SpringApplication.run(SimpleWasDemoApplication.class, args);
 	}
 
 	// -----------------------------------------

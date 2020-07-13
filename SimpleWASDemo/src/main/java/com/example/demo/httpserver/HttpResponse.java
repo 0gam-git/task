@@ -6,17 +6,11 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.demo.httpserver.type.HttpMethodType;
-
 public class HttpResponse {
 
 	private static String serverInfo;
 	private static Map<Integer, String> responses;
-
-	private HttpRequest request;
-
-	// default to "200 - OK"
-	private int code = 200; 
+	private int code = 200;
 	private byte[] body;
 	private String mimeType = "text/plain";
 	private long size = -1;
@@ -27,14 +21,8 @@ public class HttpResponse {
 	private DataOutputStream writer;
 
 	public HttpResponse(HttpRequest req) throws IOException {
-		if (getServerInfo() == null || getServerInfo().isEmpty()) {
-
-		}
-
 		socket = req.getConnection();
 		writer = new DataOutputStream(socket.getOutputStream());
-
-		request = req;
 	}
 
 	public void message(int code, String message) {
@@ -43,67 +31,9 @@ public class HttpResponse {
 		setMimeType("text/plain");
 	}
 
-	public void noContent() {
-		setCode(204);
-		setBody("");
-		setMimeType("");
-	}
-
 	public void error(int code, String message, Throwable t) {
 		t.printStackTrace();
 		message(code, message);
-	}
-
-	public void respond() {
-		try {
-			if (getSocket() == null) {
-				throw new HttpException("Socket is null...");
-			} else if (getSocket().isClosed()) {
-				throw new HttpException("Socket is closed...");
-			}
-			if (getBody() == null) {
-				noContent();
-			}
-
-			writeLine("HTTP/1.1 " + getResponseCodeMessage(getCode()));
-			writeLine("Server: " + getServerInfo());
-			writeLine("Content-Type: " + getMimeType());
-			writeLine("Connection: close");
-
-			if (getSize() != -1) {
-				writeLine("Content-Size: " + getSize());
-			} else {
-				writeLine("Content-Size: " + getBody().length);
-			}
-
-			if (!getHeaders().isEmpty()) {
-				StringBuilder b = new StringBuilder();
-				for (String key : getHeaders().keySet()) {
-					b.append(key);
-					b.append(": ");
-					b.append(getHeader(key));
-					b.append("\n");
-				}
-				writeLine(b.toString());
-			}
-
-			writeLine("");
-
-			if (getRequest().isType(HttpMethodType.HEAD.name()) || getCode() == 204) {
-				return;
-			}
-
-			getWriter().write(getBody());
-		} catch (HttpException | IOException e) {
-			System.err.println("Something bad happened while trying to send data " + "to the client");
-			e.printStackTrace();
-		} finally {
-			try {
-				getWriter().close();
-			} catch (NullPointerException | IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	protected void writeLine(String line) throws IOException {
@@ -168,15 +98,7 @@ public class HttpResponse {
 		this.headers.put(key, value);
 	}
 
-	private HttpRequest getRequest() {
-		return request;
-	}
-
-	private Socket getSocket() {
-		return socket;
-	}
-
-	private DataOutputStream getWriter() {
+	public DataOutputStream getWriter() {
 		return writer;
 	}
 

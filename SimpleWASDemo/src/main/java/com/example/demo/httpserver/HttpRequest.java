@@ -12,41 +12,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.demo.httpserver.exception.HttpException;
 import com.example.demo.httpserver.type.HttpMethodType;
+import com.example.demo.service.ServletImpl;
+import com.example.demo.service.SimpleServlet;
 
 /**
  * http://www.w3.org/Protocols/rfc2616/rfc2616.html
  */
 public class HttpRequest implements Runnable {
 
-	private HttpRouter router;
-
 	private Socket connection;
-
-	private HttpHandler handler;
-
 	private String httpRequest;
-
 	private String requestLine;
-
 	private String requestType;
-
+	private String requestBody;
 	private String requestProtocol;
-
-	private Map<String, String> headers = new HashMap<>();
-
-	private List<String> splitPath = new ArrayList<>();
-
 	private String path;
-
 	private String fullPath;
 
-	// the POST data
+	private Map<String, String> headers = new HashMap<>();
+	private List<String> splitPath = new ArrayList<>();
 	private Map<String, String> params = new HashMap<>();
-
-	private List<String> varargs = new ArrayList<>();
-
-	private String requestBody;
 
 	public HttpRequest(Socket connection) throws IOException, SocketException, HttpException {
 		connection.setKeepAlive(true);
@@ -60,7 +47,7 @@ public class HttpRequest implements Runnable {
 		}
 
 		try {
-			createResponse().respond();
+			createResponse();
 		} catch (IOException | HttpException e) {
 			e.printStackTrace();
 		}
@@ -69,21 +56,22 @@ public class HttpRequest implements Runnable {
 	public HttpResponse createResponse() throws IOException, HttpException {
 		parseRequest();
 		HttpResponse response = new HttpResponse(this);
-		determineHandler().handle(this, response);
+		
+		SimpleServlet servlet = new ServletImpl();
+		servlet.service(this, response);
 
 		return response;
 	}
 
 	/**
-	 * https://github.com/dkuntz2/java-httpserver/issues/12 RFC 2616#4.2:
 	 * http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
-	 * 
 	 */
 	public void parseRequest() throws IOException, SocketException, HttpException {
 		BufferedReader input = new BufferedReader(new InputStreamReader(getConnection().getInputStream()));
 		StringBuilder requestBuilder = new StringBuilder();
 
 		String firstLine = input.readLine();
+		
 		if (firstLine == null) {
 			throw new HttpException("Input is returning nulls...");
 		}
@@ -114,15 +102,10 @@ public class HttpRequest implements Runnable {
 			getHeaders().put(items[0], value);
 		}
 
-		if (getRequestType().equals(HttpMethodType.GET.name())) {
-
-		} else {
-
-		}
-
 		if ((getRequestType().equals(HttpMethodType.POST.name())
 				|| getRequestType().equals(HttpMethodType.DELETE.name())
 				|| getRequestType().equals(HttpMethodType.PUT.name())) && getHeaders().containsKey("Content-Length")) {
+
 			int contentLength = Integer.parseInt(getHeaders().get("Content-Length"));
 			StringBuilder b = new StringBuilder();
 
@@ -161,16 +144,6 @@ public class HttpRequest implements Runnable {
 		return out;
 	}
 
-	public HttpHandler determineHandler() {
-		if (router == null) {
-			return new HttpHandler() {
-			};
-		}
-
-		String path = getSplitPath().isEmpty() ? "" : getSplitPath().get(0);
-		return router.route(path, this);
-	}
-
 	public boolean isType(String requestTypeCheck) {
 		return getRequestType().equalsIgnoreCase(requestTypeCheck);
 	}
@@ -183,10 +156,8 @@ public class HttpRequest implements Runnable {
 			throw new HttpException("Request line has a number of spaces other than 3.");
 		}
 
-		setRequestType(splitty[0].toUpperCase());
-
+		setHttpMethodType(splitty[0].toUpperCase());
 		setFullPath(splitty[1]);
-
 		setRequestProtocol(splitty[2]);
 	}
 
@@ -198,18 +169,6 @@ public class HttpRequest implements Runnable {
 		this.fullPath = inPath;
 		setPath(inPath);
 		setSplitPath(inPath);
-	}
-
-	public String getFullPath() {
-		return fullPath;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	public String getPath() {
-		return path;
 	}
 
 	public void setSplitPath(String fullPath) {
@@ -233,6 +192,18 @@ public class HttpRequest implements Runnable {
 
 			getParams().putAll(parseInputData(data));
 		}
+	}
+
+	public String getFullPath() {
+		return fullPath;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public String getPath() {
+		return path;
 	}
 
 	public void setSplitPath(List<String> path) {
@@ -275,14 +246,6 @@ public class HttpRequest implements Runnable {
 		return this.params.get(key);
 	}
 
-	public void mergeVarargs(List<String> data) {
-		this.varargs.addAll(data);
-	}
-
-	public List<String> getVarargs() {
-		return this.varargs;
-	}
-
 	public void setHttpRequest(String httpRequest) {
 		this.httpRequest = httpRequest;
 	}
@@ -291,7 +254,7 @@ public class HttpRequest implements Runnable {
 		return httpRequest;
 	}
 
-	public void setRequestType(String requestType) {
+	public void setHttpMethodType(String requestType) {
 		this.requestType = requestType;
 	}
 
@@ -305,22 +268,6 @@ public class HttpRequest implements Runnable {
 
 	public String getRequestProtocol() {
 		return requestProtocol;
-	}
-
-	public void setHandler(HttpHandler handler) {
-		this.handler = handler;
-	}
-
-	public HttpHandler getHandler() {
-		return handler;
-	}
-
-	public void setRouter(HttpRouter router) {
-		this.router = router;
-	}
-
-	public HttpRouter getRouter() {
-		return router;
 	}
 
 	public String getRequestBody() {

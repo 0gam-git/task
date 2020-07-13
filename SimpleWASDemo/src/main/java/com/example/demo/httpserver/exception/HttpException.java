@@ -1,4 +1,4 @@
-package com.example.demo.httpserver;
+package com.example.demo.httpserver.exception;
 
 public class HttpException extends Exception {
 	private static final long serialVersionUID = -1318922991257945983L;
