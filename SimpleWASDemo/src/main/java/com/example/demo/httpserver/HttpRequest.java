@@ -14,7 +14,8 @@ import java.util.Map;
 
 import com.example.demo.httpserver.exception.HttpException;
 import com.example.demo.httpserver.type.HttpMethodType;
-import com.example.demo.service.ServletImpl;
+import com.example.demo.service.TimeServlet;
+import com.example.demo.service.HelloServlet;
 import com.example.demo.service.SimpleServlet;
 
 /**
@@ -34,6 +35,7 @@ public class HttpRequest implements Runnable {
 	private Map<String, String> headers = new HashMap<>();
 	private List<String> splitPath = new ArrayList<>();
 	private Map<String, String> params = new HashMap<>();
+	Map<String, ServletMapping> servletMap = new HashMap<>();
 
 	public HttpRequest(Socket connection) throws IOException, SocketException, HttpException {
 		connection.setKeepAlive(true);
@@ -47,6 +49,7 @@ public class HttpRequest implements Runnable {
 		}
 
 		try {
+			createServletMapping();
 			createResponse();
 		} catch (IOException | HttpException e) {
 			e.printStackTrace();
@@ -56,11 +59,22 @@ public class HttpRequest implements Runnable {
 	public HttpResponse createResponse() throws IOException, HttpException {
 		parseRequest();
 		HttpResponse response = new HttpResponse(this);
-		
-		SimpleServlet servlet = new ServletImpl();
-		servlet.service(this, response);
+		handle(response);
 
 		return response;
+	}
+
+	private void handle(HttpResponse response) throws IOException {
+		SimpleServlet servlet = null;
+
+		if (servletMap.get(getFullPath()) != null) {
+			servlet = new HelloServlet();
+
+		} else {
+			servlet = new TimeServlet();
+		}
+
+		servlet.service(this, response);
 	}
 
 	/**
@@ -71,7 +85,7 @@ public class HttpRequest implements Runnable {
 		StringBuilder requestBuilder = new StringBuilder();
 
 		String firstLine = input.readLine();
-		
+
 		if (firstLine == null) {
 			throw new HttpException("Input is returning nulls...");
 		}
@@ -192,6 +206,15 @@ public class HttpRequest implements Runnable {
 
 			getParams().putAll(parseInputData(data));
 		}
+	}
+
+	public void createServletMapping() {
+		ServletMapping servlet = new ServletMapping("HelloWorldServlet", "/sayhello", "HelloServlet");
+		servletMap.put(servlet.getUrlPattern(), servlet);
+	}
+
+	public Map<String, ServletMapping> getServletMap() {
+		return servletMap;
 	}
 
 	public String getFullPath() {

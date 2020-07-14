@@ -6,27 +6,38 @@ import java.util.Date;
 
 import com.example.demo.httpserver.HttpRequest;
 import com.example.demo.httpserver.HttpResponse;
+import com.example.demo.httpserver.ServletMapping;
 import com.example.demo.httpserver.type.HttpMethodType;
 
-public class ServletImpl implements SimpleServlet {
+public class HelloServlet implements SimpleServlet {
 
 	@Override
 	public void service(HttpRequest req, HttpResponse res) throws IOException {
 
+		String body = "";
 		if (req.getRequestType().equals(HttpMethodType.GET.name())) {
-			// file read?
-			// url mapping?
+			ServletMapping servlet = req.getServletMap().get(req.getFullPath());
+
+			body = new StringBuilder("<HTML>\r\n").append("<HEAD><TITLE>Hello, World</TITLE>\r\n").append("</HEAD>\r\n")
+					.append("<BODY>").append("<H1>Hello, World</H1>\r\n")
+					.append("<p>Request URI: " + req.getFullPath() + "</p>")
+					.append("<p>Request Protocol: " + req.getRequestProtocol() + "</p>")
+					.append("<p>Servlet Class: " + servlet.getServletClass() + "</p>")
+					.append("<p>Servlet Name: " + servlet.getServletName() + "</p>").append("</BODY></HTML>\r\n")
+					.toString();
 
 		} else {
-			String body = new StringBuilder("<HTML>\r\n").append("<HEAD><TITLE>Not Implemented</TITLE>\r\n")
+			body = new StringBuilder("<HTML>\r\n").append("<HEAD><TITLE>Not Implemented</TITLE>\r\n")
 					.append("</HEAD>\r\n").append("<BODY>").append("<H1>HTTP Error 501: Not Implemented</H1>\r\n")
 					.append("</BODY></HTML>\r\n").toString();
-			if (req.getRequestProtocol().startsWith("HTTP/")) { // send a MIME header
-				sendHeader(res.getWriter(), "HTTP/1.0 501 Not Implemented", "text/html; charset=utf-8", body.length());
-			}
-			res.getWriter().writeBytes(body);
-			res.getWriter().flush();
 		}
+
+		if (req.getRequestProtocol().startsWith("HTTP/")) {
+			sendHeader(res.getWriter(), "HTTP/1.0", "text/html; charset=utf-8", body.length());
+		}
+
+		res.writeLine(body);
+		res.getWriter().close();
 	}
 
 	private void sendHeader(DataOutputStream out, String responseCode, String contentType, int length)

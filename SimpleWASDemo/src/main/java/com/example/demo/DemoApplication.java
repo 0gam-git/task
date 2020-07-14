@@ -38,16 +38,12 @@ public class DemoApplication implements CommandLineRunner, ExitCodeGenerator {
 		int port = 0;
 
 		if (0 < args.length) {
-			String arg = args[0];
-
-			if (arg != null && !"".equals(arg)) {
-				try {
-					port = Integer.parseInt(arg);
-				} catch (NumberFormatException ex) {
-					logger.log(Level.WARNING, "not supported argument.", ex);
-					usage();
-					System.exit(SpringApplication.exit(context));
-				}
+			try {
+				port = Integer.parseInt(args[0]);
+			} catch (NumberFormatException ex) {
+				logger.log(Level.WARNING, "not supported argument.", ex);
+				usage();
+				System.exit(SpringApplication.exit(context));
 			}
 		}
 
@@ -67,7 +63,8 @@ public class DemoApplication implements CommandLineRunner, ExitCodeGenerator {
 	// -----------------------------------------
 
 	private void usage() {
-		System.out.println("args - [<port>]");
+		System.out.println("- Usage -");
+		System.out.println("1. args - [<Port>]");
 	}
 
 }

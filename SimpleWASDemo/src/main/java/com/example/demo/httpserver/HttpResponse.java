@@ -36,7 +36,7 @@ public class HttpResponse {
 		message(code, message);
 	}
 
-	protected void writeLine(String line) throws IOException {
+	public void writeLine(String line) throws IOException {
 		getWriter().writeBytes(line + "\n");
 	}
 
