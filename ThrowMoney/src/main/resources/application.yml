@@ -1,0 +1,14 @@
+# 필요 시 레디스 노드와 센티널을 준비하여 연결한다.
+spring:
+  profiles:
+    active: local
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600
+  redis:
+    port: 6379
+    
+    lettuce:
+      shutdown-timeout: 100ms
