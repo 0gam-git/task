@@ -8,10 +8,9 @@
 4. 빈번한 접근 및 확인은 cache를 이용하자.
 5. TTL을 이용하여 요구사항의 만료시간을 지키자.
 
-## 테스트
-* Postman를 이용한다.
-* https://orange-zodiac-397903.postman.co/workspace/Team-Workspace~391d9e79-9a2f-4a12-8ed5-7a2e4539d832/documentation/2042013-f3747d58-3606-4291-89a4-f95200baa327
-* 
+## API문서화 및 자동화 테스트
+* Postman를 이용한다.(https://www.postman.com/)
+* 위 링크에서 다운로드 후, "사전과제.postman_collection.json"를 import 한다.
 
 
  
