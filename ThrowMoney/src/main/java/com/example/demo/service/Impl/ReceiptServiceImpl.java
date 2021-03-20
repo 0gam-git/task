@@ -26,7 +26,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 		redisUtil.addList(key, userId);
 	}
 
-	@Cacheable(value = "RestrictedUserList", key = "#key", unless = "#result == null")
+	@Cacheable(value = "RestrictedUserList", key = "#key")
 	@Override
 	public List<Integer> getRestrictedUserList(String key) {
 		return redisUtil.getListMembers(key);
