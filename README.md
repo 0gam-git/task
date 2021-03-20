@@ -12,6 +12,8 @@
 * Postman를 이용한다.(https://www.postman.com/)
 * 위 링크에서 다운로드 후, "사전과제.postman_collection.json"를 import 한다.
 
+![image](https://user-images.githubusercontent.com/16284971/111865033-e20d5380-89a7-11eb-8788-da7df82646c5.png)
+
  
 
 ## License
