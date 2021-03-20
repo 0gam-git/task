@@ -21,7 +21,6 @@ import com.example.demo.component.RedisUtil;
 @SpringBootTest
 public class RedisTests {
 
-	private final int USER_ID = 1;
 	private final String ROOM_ID = "test-room";
 
 	@Autowired
@@ -84,6 +83,8 @@ public class RedisTests {
 	 * pop 형태로 "받기 사용자" 요청 시 금액을 전달한다.
 	 * 
 	 * 만료 시간 10분 확인
+	 * 
+	 * 다 꺼내면 만료
 	 */
 	@Test
 	public void popTest() {

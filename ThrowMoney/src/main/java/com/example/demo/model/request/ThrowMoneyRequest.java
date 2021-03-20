@@ -1,18 +1,18 @@
 package com.example.demo.model.request;
 
-import javax.validation.constraints.Min;
+import org.hibernate.validator.constraints.Range;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
 @AllArgsConstructor
+@Getter
 public class ThrowMoneyRequest {
 
-	@Min(1)
+	@Range(min = 1, max = 10000000, message = "The payment amount is between {min} and {max}.")
 	int amountPaid;
 
-	@Min(1)
+	@Range(min = 1, max = 1000, message = "The number of people is from {min} to {max}.")
 	int headCount;
 
 }

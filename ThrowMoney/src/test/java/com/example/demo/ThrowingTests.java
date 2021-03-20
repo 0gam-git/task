@@ -27,7 +27,7 @@ public class ThrowingTests {
 
 	// X-USER-ID, X-ROOM-ID
 	private final int USER_ID = 1;
-	private final String ROOM_ID = "test-room입니다";
+	private final String ROOM_ID = "room-id-1";
 
 	@Autowired
 	private RedisUtil<Object> redisUtil;
@@ -87,7 +87,7 @@ public class ThrowingTests {
 
 		// response => token
 		System.out.println("## response : " + token);
-		
+
 		// 확인
 		Long size = redisUtil.getListSize(receiptKey);
 		assertEquals(headCount, size);
@@ -107,11 +107,11 @@ public class ThrowingTests {
 	}
 
 	/**
-	 * 검증 : 뿌리기 등록 후 만료 확인 (7일, 7일, 10분)
+	 * 검증 : 뿌리기 등록 후 만료 확인 (조회용 7일, 받기용 10분)
 	 */
 	@Test
 	public void confirmExpirationTest() {
-		String token = "8KObk+K+oQ==";
+		String token = "8KqTneyRjg==";
 		String roomId = Base64.getEncoder().encodeToString(ROOM_ID.getBytes());
 
 		String lookupKey = RedisKeyUtil.getLookupKey(roomId, token);
@@ -119,17 +119,17 @@ public class ThrowingTests {
 		String restrictionListKey = RedisKeyUtil.getRestrictedUserListKey(roomId, token);
 
 		Long days1 = redisUtil.getExpire(lookupKey, TimeUnit.DAYS);
-		Long days2 = redisUtil.getExpire(restrictionListKey, TimeUnit.DAYS);
-		Long minutes1 = redisUtil.getExpire(receiptKey, TimeUnit.MINUTES);
+		Long minutes1 = redisUtil.getExpire(restrictionListKey, TimeUnit.MINUTES);
+		Long minutes2 = redisUtil.getExpire(receiptKey, TimeUnit.MINUTES);
 
 		assertThat(days1).isGreaterThan(-2);
 		System.out.println("lookup API : " + days1 + " days left.");
 
-		assertThat(days2).isGreaterThan(-2);
-		System.out.println("restriction-list API : " + days2 + " days left.");
-
 		assertThat(minutes1).isGreaterThan(-2);
-		System.out.println("receiptKey API : " + minutes1 + " minutes left.");
+		System.out.println("restriction-list API : " + minutes1 + " minutes left.");
+
+		assertThat(minutes2).isGreaterThan(-2);
+		System.out.println("receiptKey API : " + minutes2 + " minutes left.");
 
 	}
 

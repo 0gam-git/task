@@ -34,11 +34,9 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 	@Override
 	public void distributeRandomMoney(String key, int amountPaid, int headCount) {
-		PriorityQueue<Integer> randomMoney = RandomMoneyUtil.getRandomDistribution(amountPaid, headCount);
+		PriorityQueue<Integer> randomMoneyBundle = RandomMoneyUtil.getRandomDistribution(amountPaid, headCount);
 
-		for (Integer amountReceipt : randomMoney) {
-			redisUtil.addList(key, amountReceipt);
-		}
+		redisUtil.addListAll(key, randomMoneyBundle);
 	}
 
 	@Override

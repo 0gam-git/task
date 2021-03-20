@@ -1,19 +1,22 @@
 package com.example.demo.controller;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.validation.constraints.NotEmpty;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -38,20 +41,27 @@ public class Controller {
 	private ReceiptService receiptService;
 	private ThrowMoneyService throwMoneyService;
 	private CommonService commonService;
+	private MessageSource messageSource;
 
 	public Controller(ReceiptService receiptService, ThrowMoneyService throwingMoneyService,
-			CommonService commonService) {
+			CommonService commonService, MessageSource messageSource) {
 		this.receiptService = receiptService;
 		this.throwMoneyService = throwingMoneyService;
 		this.commonService = commonService;
+		this.messageSource = messageSource;
 	}
 
-	@PostMapping(value = "/remittance/throwing-money")
+	@PostMapping(value = "/remittance/throw-money")
 	public TokenModel giveMoney(@RequestHeader("X-USER-ID") int userId, @RequestHeader("X-ROOM-ID") String roomId,
-			@Validated @RequestBody ThrowMoneyRequest requestModel) {
+			@Validated @RequestBody ThrowMoneyRequest requestModel, Errors errors) {
 
-		log.debug("## userId : {}, roomId : {}, amountPaid : {}, headCount : {}", userId, roomId,
+		log.info("## giveMoney - userId : {}, roomId : {}, amountPaid : {}, headCount : {}", userId, roomId,
 				requestModel.getAmountPaid(), requestModel.getHeadCount());
+
+		if (errors.hasErrors()) {
+			String message = messageSource.getMessage(errors.getFieldError(), Locale.getDefault());
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+		}
 
 		int amountPaid = requestModel.getAmountPaid();
 		int headCount = requestModel.getHeadCount();
@@ -75,15 +85,19 @@ public class Controller {
 		return TokenModel.builder().token(token).build();
 	}
 
-	@GetMapping(value = "/remittance/throwing-money/receipt/{token}")
+	@GetMapping(value = "/remittance/throw-money/receipt")
 	public ReceiptModel getMoney(@RequestHeader("X-USER-ID") int userId, @RequestHeader("X-ROOM-ID") String roomId,
-			@NotEmpty @PathVariable String token) {
+			@NotEmpty @RequestParam String token) {
 
-		log.debug("## userId : {}, roomId : {}, token : {}", userId, roomId, token);
+		log.info("## getMoney - userId : {}, roomId : {}, token : {}", userId, roomId, token);
+
 		roomId = StringUtil.getEncodeString(roomId);
-
 		String receiptKey = RedisKeyUtil.getReceiptKey(roomId, token);
 		String userIdListKey = RedisKeyUtil.getRestrictedUserListKey(roomId, token);
+
+		if (commonService.isExpire(receiptKey, TimeUnit.MINUTES) < 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This is an expired request. Receive failure.");
+		}
 
 		List<Integer> restrictionUserIdList = receiptService.getRestrictedUserList(userIdListKey);
 
@@ -91,10 +105,8 @@ public class Controller {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please check the token or chat room ID.");
 		}
 		if (restrictionUserIdList.contains(userId)) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please check the user ID.");
-		}
-		if (commonService.isExpire(receiptKey, TimeUnit.MINUTES) < 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to receive.");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"It is the creator or user who has already received it.");
 		}
 
 		int randomMoney = receiptService.pickRandomMoney(receiptKey);
@@ -106,17 +118,23 @@ public class Controller {
 		return ReceiptModel.builder().amountReceipt(randomMoney).build();
 	}
 
-	@GetMapping(value = "/remittance/throwing-money/{token}")
+	@GetMapping(value = "/remittance/throw-money")
 	public ThrowMoneyStatusModel getThrowMoney(@RequestHeader("X-USER-ID") int userId,
-			@RequestHeader("X-ROOM-ID") String roomId, @NotEmpty @PathVariable String token) {
+			@RequestHeader("X-ROOM-ID") String roomId, @NotEmpty @RequestParam String token) {
 
-		log.debug("## userId : {}, roomId : {}, token : {}", userId, roomId, token);
+		log.info("## getThrowMoney - userId : {}, roomId : {}, token : {}", userId, roomId, token);
+
+		roomId = StringUtil.getEncodeString(roomId);
 		String lookupKey = RedisKeyUtil.getLookupKey(roomId, token);
 
 		ThrowMoney model = throwMoneyService.getThrowingMoney(lookupKey);
 
-		if (commonService.isExpire(lookupKey, TimeUnit.DAYS) < 0 || null == model || model.getCreatedById() != userId) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lookup failed.");
+		if (commonService.isExpire(lookupKey, TimeUnit.DAYS) < 0 || null == model) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"Expired or no results were found. Lookup failure.");
+		}
+		if (model.getCreatedById() != userId) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only the creator can search. Lookup failure.");
 		}
 
 		return ThrowMoneyStatusModel.builder().startDateTime(model.getStartDateTime()).amountPaid(model.getAmountPaid())

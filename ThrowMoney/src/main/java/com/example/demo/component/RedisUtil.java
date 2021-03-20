@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +53,10 @@ public class RedisUtil<T> {
 	// List
 	public void addList(String key, T value) {
 		listOperations.leftPush(key, value);
+	}
+
+	public void addListAll(String key, Collection<T> values) {
+		listOperations.leftPushAll(key, values);
 	}
 
 	public List<T> getListMembers(String key) {

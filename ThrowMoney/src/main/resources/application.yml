@@ -1,4 +1,4 @@
-# 필요 시 레디스 노드와 센티널을 준비하여 연결한다.
+# 미래에 필요 시 레디스 클러스터와 센티널을 준비하여 연결한다.
 spring:
   profiles:
     active: local
@@ -12,3 +12,12 @@ spring:
     
     lettuce:
       shutdown-timeout: 100ms
+
+server:
+  error:
+    include-message: always
+    
+logging:
+  level:
+    root: info
+    
