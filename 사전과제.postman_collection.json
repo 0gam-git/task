@@ -439,12 +439,7 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"돈 뿌리기 생성자가 요청했을 시\",function(){\r",
-							"    pm.request.headers.add(\"X-USER-ID\", 1);\r",
-							"    \r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData).to.have.key(\"message\");\r",
-							"});"
+							""
 						],
 						"type": "text/javascript"
 					}
