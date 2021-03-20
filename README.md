@@ -8,7 +8,7 @@
 4. TTL을 이용하여 요구사항의 만료시간 제어한다.
 
 
-## API 문서화 및 자동화 테스트
+## API 문서화 및 테스트 자동화
 * Postman를 이용한다.(https://www.postman.com/)
 * 위 링크에서 다운로드 후, "사전과제.postman_collection.json"를 import 한다.
 
