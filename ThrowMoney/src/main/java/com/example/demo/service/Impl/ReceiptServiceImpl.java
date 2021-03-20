@@ -3,8 +3,6 @@ package com.example.demo.service.Impl;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.component.RedisUtil;
@@ -20,13 +18,11 @@ public class ReceiptServiceImpl implements ReceiptService {
 		this.redisUtil = redisUtil;
 	}
 
-	@CachePut(value = "RestrictedUserList", key = "#key")
 	@Override
 	public void addRestrictedUser(String key, int userId) {
 		redisUtil.addList(key, userId);
 	}
 
-	@Cacheable(value = "RestrictedUserList", key = "#key")
 	@Override
 	public List<Integer> getRestrictedUserList(String key) {
 		return redisUtil.getListMembers(key);
