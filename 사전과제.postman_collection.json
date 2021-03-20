@@ -1,0 +1,1219 @@
+{
+	"info": {
+		"_postman_id": "f3747d58-3606-4291-89a4-f95200baa327",
+		"name": "사전과제",
+		"description": "# Introduction\n송금 > 돈 뿌리기/받기/상태 조회에 대한 API 문서입니다.\n\n# Overview\n1. 제약사항과 요구사항에 대해서 테스트\n2. 요구사항에 만족하는지 확인\n3. 미래에 확장 가능성(필요 시 Redis클러스터와 센티널을 이용한다)\n\n# Authentication\n1. API의 형태는 REST API형태입니다.\n2. 요청 시, HTTP Header에 숫자 형태의 X-USER-ID와 문자 형태의 X-ROOM-ID이 전달되어야 합니다.\n\n# Error Codes\n1. 예상되는 에러코드는 400, BAD_REQUEST입니다. 발생 이유도 함께 전달됩니다.\n\n# Rate limit\n1. 받기 API는 한 사람당 하나의 받기만 가능합니다.\n2. 조회 API는 돈뿌리기 생성자만 조회 가능합니다.\n3. 돈뿌리기 API는 누구나 생성 가능합니다.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "뿌리기 API",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"토큰 획득 확인\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    var responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.have.keys('token');\r",
+							"\r",
+							"    // 성공 시, 다음 요청을 위해서 토큰을 저장한다.\r",
+							"    postman.setEnvironmentVariable(\"token\", responseJson.token);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-USER-ID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "X-ROOM-ID",
+						"value": "room-id-1",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json;charset=UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amountPaid\": 1500,\r\n    \"headCount\": 10\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/payment/remittance/throw-money",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"payment",
+						"remittance",
+						"throw-money"
+					]
+				},
+				"description": "뿌리기 API"
+			},
+			"response": [
+				{
+					"name": "validation - 금액 최소값",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amountPaid\": 0,\r\n    \"headCount\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:21:34 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T07:21:34.283+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"The payment amount is between 1 and 10000000.\",\n    \"path\": \"/v1/payment/remittance/throw-money\"\n}"
+				},
+				{
+					"name": "뿌리기 API(성공)",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amountPaid\": 1500,\r\n    \"headCount\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:19:52 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"token\": \"76yg8KeOiA==\"\n}"
+				},
+				{
+					"name": "validation - 금액 최대값",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amountPaid\": 10000001,\r\n    \"headCount\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:23:19 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T07:23:19.031+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"The payment amount is between 1 and 10000000.\",\n    \"path\": \"/v1/payment/remittance/throw-money\"\n}"
+				},
+				{
+					"name": "validation - 인원수 최대값",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amountPaid\": 1500,\r\n    \"headCount\": 1001\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:25:20 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T07:25:20.979+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"The number of people is from 1 to 1000.\",\n    \"path\": \"/v1/payment/remittance/throw-money\"\n}"
+				},
+				{
+					"name": "validation - 인원수 최소값",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amountPaid\": 1500,\r\n    \"headCount\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:24:36 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T07:24:36.101+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"The number of people is from 1 to 1000.\",\n    \"path\": \"/v1/payment/remittance/throw-money\"\n}"
+				}
+			]
+		},
+		{
+			"name": "받기 API",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"돈 뿌리기 생성자가 요청했을 시\",function(){\r",
+							"    pm.request.headers.add(\"X-USER-ID\", 1);\r",
+							"    \r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.key(\"message\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-USER-ID",
+						"value": "12",
+						"type": "text"
+					},
+					{
+						"key": "X-ROOM-ID",
+						"value": "room-id-1",
+						"type": "text"
+					},
+					{
+						"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+						"key": "Content-Type",
+						"value": "application/json;charset=UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"description": "뿌리기 API로 생성하면 자동으로 값 들어감 ",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/payment/remittance/throw-money/receipt",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"payment",
+						"remittance",
+						"throw-money",
+						"receipt"
+					]
+				},
+				"description": "받기 API"
+			},
+			"response": [
+				{
+					"name": "자신이 뿌리기한 건은 자신이 받을 수 없습니다.",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money/receipt",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money",
+								"receipt"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:43:22 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T07:43:22.968+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"It is the creator or user who has already received it.\",\n    \"path\": \"/v1/payment/remittance/throw-money/receipt\"\n}"
+				},
+				{
+					"name": "뿌린 건은 10분간만 유효합니다. 뿌린지 10분이 지난 요청에 대해서는 받기 실패 응답이 내려가야 합니다.",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money/receipt",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money",
+								"receipt"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:39:07 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T07:39:07.713+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"This is an expired request. Receive failure.\",\n    \"path\": \"/v1/payment/remittance/throw-money/receipt\"\n}"
+				},
+				{
+					"name": "뿌리기 당 한 사용자는 한번만 받을 수 있습니다.(3번 유저로 또 요청함)",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money/receipt",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money",
+								"receipt"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:45:21 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T07:45:21.087+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"It is the creator or user who has already received it.\",\n    \"path\": \"/v1/payment/remittance/throw-money/receipt\"\n}"
+				},
+				{
+					"name": "뿌리기가 호출된 대화방과 동일한 대화방에 속한 사용자만이 받을 수 있습니다.(다른 방 이름으로)",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-2",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money/receipt",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money",
+								"receipt"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:47:05 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T07:47:05.780+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"Please check the token or chat room ID.\",\n    \"path\": \"/v1/payment/remittance/throw-money/receipt\"\n}"
+				},
+				{
+					"name": "받기 API(성공) 2원받음..(3번 유저)",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money/receipt",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money",
+								"receipt"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:44:38 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"amountReceipt\": 2\n}"
+				},
+				{
+					"name": "지정한 인원수 이상으로 다 받아갈 경우 만료처리 확인",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "12",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"description": "뿌리기 API로 생성하면 자동으로 값 들어감 ",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money/receipt",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money",
+								"receipt"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 08:18:45 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T08:18:45.821+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"This is an expired request. Receive failure.\",\n    \"path\": \"/v1/payment/remittance/throw-money/receipt\"\n}"
+				}
+			]
+		},
+		{
+			"name": "조회 API",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-USER-ID",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "X-ROOM-ID",
+						"value": "room-id-1",
+						"type": "text"
+					},
+					{
+						"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+						"key": "Content-Type",
+						"value": "application/json;charset=UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"description": "뿌리기 API로 생성하면 자동으로 값 들어감 ",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/payment/remittance/throw-money",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"payment",
+						"remittance",
+						"throw-money"
+					]
+				},
+				"description": "조회 API"
+			},
+			"response": [
+				{
+					"name": "조회 API(성공) - 3,4번 유저 확인(생성자로 조회함)",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"description": "뿌리기 API로 생성하면 자동으로 값 들어감 ",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 07:56:13 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"startDateTime\": \"2021-03-20T07:43:19.185Z\",\n    \"amountPaid\": 1500,\n    \"amountReceipt\": 1490,\n    \"receipts\": [\n        {\n            \"userId\": 3,\n            \"amountReceipt\": 2\n        },\n        {\n            \"userId\": 4,\n            \"amountReceipt\": 8\n        }\n    ]\n}"
+				},
+				{
+					"name": "뿌린 건에 대한 조회는 7일 동안 할 수 있습니다. (테스트를 위해서 7분으로 변경 후 테스트 진행함)",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"description": "뿌리기 API로 생성하면 자동으로 값 들어감 ",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 08:23:40 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T08:23:40.408+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"Expired or no results were found. Lookup failure.\",\n    \"path\": \"/v1/payment/remittance/throw-money\"\n}"
+				},
+				{
+					"name": "뿌린 사람 자신만 조회를 할 수 있습니다. 다른사람의 뿌리기건이나 유효하지 않은 token에 대해서는 조회 실패 응답이 내려가야 합니다. (2번 유저로 조회 시도)",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-USER-ID",
+								"value": "2",
+								"type": "text"
+							},
+							{
+								"key": "X-ROOM-ID",
+								"value": "room-id-1",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"description": "뿌리기 API로 생성하면 자동으로 값 들어감 ",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/payment/remittance/throw-money",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"payment",
+								"remittance",
+								"throw-money"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 20 Mar 2021 08:07:33 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": \"2021-03-20T08:07:33.943+00:00\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"Only the creator can search. Lookup failure.\",\n    \"path\": \"/v1/payment/remittance/throw-money\"\n}"
+				}
+			]
+		}
+	]
+}
